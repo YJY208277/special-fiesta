@@ -11,8 +11,8 @@
     GET  /api/snapshot   最近一帧快照
     WS   /ws             实时目标帧
 
-静态前端默认从同级的 frontend/ 目录挂载。项目完成前端后，将 index.html
-及 assets 放入该目录即可通过 http://127.0.0.1:8000/ 访问。
+静态前端默认从同级的 frontend/ 目录挂载，通过 http://127.0.0.1:8000/
+即可打开雷达显控页面。
 """
 
 from __future__ import annotations
