@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#030806" />
+    <title>RadarScope // 雷达显控终端</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+
+    <div class="terminal-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <div class="eyebrow">TACTICAL SURVEILLANCE SYSTEM</div>
+            <h1>RADAR<span>SCOPE</span><b>//</b><small>PPI-07</small></h1>
+          </div>
+        </div>
+
+        <div class="top-status">
+          <div class="status-cell">
+            <span>SYSTEM</span>
+            <strong class="status-online">NOMINAL</strong>
+          </div>
+          <div class="status-cell">
+            <span>LINK</span>
+            <strong id="linkState">CONNECTING</strong>
+          </div>
+          <div class="status-cell status-time">
+            <span>LOCAL TIME</span>
+            <strong id="systemClock">--:--:--</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-grid">
+        <aside class="panel target-panel clipped-panel">
+          <section class="radar-identity">
+            <div class="panel-kicker"><i></i> SENSOR ARRAY</div>
+            <div class="radar-title-row">
+              <div>
+                <h2 id="radarName">CNRAD/SA-B.001</h2>
+                <p>S-BAND EARLY WARNING RADAR</p>
+              </div>
+              <div class="mini-scope" aria-hidden="true">
+                <div class="mini-sweep" id="miniSweep"></div>
+                <div class="mini-cross"></div>
+                <span>N</span>
+              </div>
+            </div>
+          </section>
+
+          <div class="quick-metrics">
+            <div>
+              <span>RANGE</span>
+              <strong>100<small> km</small></strong>
+            </div>
+            <div>
+              <span>SCAN RATE</span>
+              <strong>30<small> rpm</small></strong>
+            </div>
+            <div>
+              <span>TRACKS</span>
+              <strong id="targetCount">00</strong>
+            </div>
+          </div>
+
+          <section class="target-section">
+            <div class="section-heading">
+              <div>
+                <span class="section-index">01</span>
+                <h2>目标态势</h2>
+              </div>
+              <span class="section-meta" id="targetMeta">AWAITING DATA</span>
+            </div>
+
+            <div class="table-wrap">
+              <table class="target-table">
+                <thead>
+                  <tr>
+                    <th>批号</th>
+                    <th>距离</th>
+                    <th>方位</th>
+                    <th>速度</th>
+                  </tr>
+                </thead>
+                <tbody id="targetTableBody">
+                  <tr class="empty-row">
+                    <td colspan="4">等待目标数据链路...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="threat-summary">
+            <div class="summary-head">
+              <span>THREAT DISTRIBUTION</span>
+              <b>LIVE</b>
+            </div>
+            <div class="threat-bars">
+              <div><span>INNER</span><i><em id="barInner"></em></i><b id="countInner">0</b></div>
+              <div><span>MID</span><i><em id="barMid"></em></i><b id="countMid">0</b></div>
+              <div><span>OUTER</span><i><em id="barOuter"></em></i><b id="countOuter">0</b></div>
+            </div>
+          </section>
+        </aside>
+
+        <section class="scope-wrap" aria-label="雷达 PPI 显示区">
+          <div class="scope-header">
+            <div class="scope-mode">
+              <span class="live-pip"></span>
+              <b>PPI / 360° SURVEILLANCE</b>
+              <i>RANGE 100 KM</i>
+            </div>
+            <div class="scope-readout">
+              <span>AZ</span>
+              <strong id="azimuthReadout">000.0°</strong>
+              <span>REV</span>
+              <strong id="revisionReadout">0000</strong>
+            </div>
+          </div>
+
+          <div class="scope-stage" id="scopeStage">
+            <canvas id="radarCanvas" aria-label="动态雷达扫描画面"></canvas>
+
+            <div class="scope-corner corner-tl" aria-hidden="true"></div>
+            <div class="scope-corner corner-tr" aria-hidden="true"></div>
+            <div class="scope-corner corner-bl" aria-hidden="true"></div>
+            <div class="scope-corner corner-br" aria-hidden="true"></div>
+
+            <div class="scope-tag tag-nw">
+              <span>MODE</span>
+              <strong>SURVEILLANCE</strong>
+            </div>
+            <div class="scope-tag tag-ne">
+              <span>SIGNAL</span>
+              <strong class="signal-text">LOCKED</strong>
+            </div>
+            <div class="scope-tag tag-sw">
+              <span>COORD</span>
+              <strong>POLAR / N-UP</strong>
+            </div>
+            <div class="scope-tag tag-se">
+              <span>FPS</span>
+              <strong id="fpsReadout">60</strong>
+            </div>
+
+            <div class="center-emblem" aria-hidden="true">
+              <span class="center-ring"></span>
+              <span class="center-dot"></span>
+              <b>CN-01</b>
+            </div>
+
+            <div class="scope-footer-line">
+              <span><i class="legend-dot target"></i> HOSTILE TRACK</span>
+              <span><i class="legend-line"></i> TRACK MEMORY</span>
+              <span><i class="legend-dot sweep"></i> ACTIVE SWEEP</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="right-stack">
+          <section class="panel telemetry-panel clipped-panel">
+            <div class="panel-kicker"><i></i> LIVE TELEMETRY</div>
+            <div class="sweep-dial-row">
+              <div class="sweep-dial">
+                <div class="dial-ticks"></div>
+                <div class="dial-needle" id="dialNeedle"></div>
+                <div class="dial-core">
+                  <span>ANT AZ</span>
+                  <strong id="dialAzimuth">000°</strong>
+                </div>
+              </div>
+              <div class="signal-bars" id="signalBars" aria-label="信号强度">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+
+            <div class="telemetry-grid">
+              <div><span>TRANSMIT</span><strong>ACTIVE</strong></div>
+              <div><span>PULSE REP</span><strong>1000 <small>Hz</small></strong></div>
+              <div><span>PEAK PWR</span><strong>1.5 <small>MW</small></strong></div>
+              <div><span>BEAM WIDTH</span><strong>3.0 <small>deg</small></strong></div>
+            </div>
+
+            <div class="wave-wrap">
+              <div class="wave-title"><span>ECHO RETURN</span><b id="waveStatus">STANDBY</b></div>
+              <canvas id="signalCanvas"></canvas>
+            </div>
+          </section>
+
+          <section class="panel params-panel clipped-panel">
+            <div class="panel-kicker"><i></i> RADAR PARAMETERS</div>
+            <div class="parameter-list">
+              <div><span>工作频率</span><b>3.0 GHz</b></div>
+              <div><span>天线增益</span><b>35 dB</b></div>
+              <div><span>理论 Rmax</span><b>189 km</b></div>
+              <div><span>检测概率</span><b>0.90</b></div>
+              <div><span>虚警概率</span><b>1E-6</b></div>
+              <div><span>仿真时间</span><b id="simTimeReadout">000.0 s</b></div>
+            </div>
+          </section>
+
+          <section class="panel event-panel clipped-panel">
+            <div class="panel-kicker"><i></i> EVENT CHANNEL</div>
+            <div class="event-log" id="eventLog">
+              <p><time>00:00:00</time><span>INIT</span> 正在建立数据链路</p>
+              <p><time>00:00:00</time><span>SYS</span> 等待 WebSocket 握手</p>
+            </div>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="footer-bar">
+        <div><span class="blink"></span> DEFENSE NETWORK // SECTOR EAST-07</div>
+        <div class="footer-center">CLASSIFICATION: EXERCISE // SIMULATION DATA</div>
+        <div>SEQ <b id="sequenceReadout">000000</b> · TICK <b id="tickReadout">0.00</b> ms</div>
+      </footer>
+    </div>
+
+    <div class="boot-overlay" id="bootOverlay">
+      <div class="boot-box">
+        <div class="boot-radar"><span></span></div>
+        <p>INITIALIZING PPI MATRIX</p>
+        <div class="boot-progress"><i></i></div>
+        <small>ESTABLISHING SECURE DATA LINK...</small>
+      </div>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
